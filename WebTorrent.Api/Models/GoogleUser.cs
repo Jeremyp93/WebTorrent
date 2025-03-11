@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace LouisManager.Api.Models;
+namespace WebTorrent.Api.Models;
 public class GoogleUser
 {
     [JsonPropertyName("id")]

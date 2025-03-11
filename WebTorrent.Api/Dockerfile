@@ -1,8 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
 
-COPY ["LouisManager.Api.csproj", "./"]
-RUN dotnet restore "./LouisManager.Api.csproj"
+# Install aria2 torrent client
+RUN apt-get update && apt-get install -y aria2
+
+COPY ["WebTorrent.Api.csproj", "./"]
+RUN dotnet restore "./WebTorrent.Api.csproj"
 COPY . ./
 # Build and publish a release
 RUN dotnet publish -c Release -o out
@@ -11,4 +14,4 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet", "LouisManager.Api.dll"]
+ENTRYPOINT ["dotnet", "WebTorrent.Api.dll"]

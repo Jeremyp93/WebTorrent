@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ManagerComponent } from './manager.component';
+import { WebtorrentComponent } from './webtorrent.component';
 
-describe('ManagerComponent', () => {
-  let component: ManagerComponent;
-  let fixture: ComponentFixture<ManagerComponent>;
+describe('WebtorrentComponent', () => {
+  let component: WebtorrentComponent;
+  let fixture: ComponentFixture<WebtorrentComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ManagerComponent]
+      imports: [WebtorrentComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ManagerComponent);
+    fixture = TestBed.createComponent(WebtorrentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

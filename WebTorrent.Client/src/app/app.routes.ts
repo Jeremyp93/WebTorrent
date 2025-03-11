@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     {
-        path: 'dashboard',
+        path: 'webtorrent',
         loadChildren: () => import('./manager/manager.routes').then(m => m.MANAGER_ROUTES),
     },
     {

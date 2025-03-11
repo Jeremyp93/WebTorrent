@@ -353,6 +353,8 @@ MigrationBackup/
 
 # Database
 database
+tmp
+data-protection-keys
 
 **/.vs/
 

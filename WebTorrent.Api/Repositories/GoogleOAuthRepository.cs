@@ -1,11 +1,11 @@
 using System.Web;
-using LouisManager.Api.Models;
-using LouisManager.Api.Options;
-using LouisManager.Api.Services;
+using WebTorrent.Api.Models;
+using WebTorrent.Api.Options;
+using WebTorrent.Api.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace LouisManager.Api.Repositories;
+namespace WebTorrent.Api.Repositories;
 public interface IGoogleOAuthRepository
 {
     string GetGoogleOAuthUrl();

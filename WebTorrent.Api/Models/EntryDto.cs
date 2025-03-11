@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace LouisManager.Api.Models;
+namespace WebTorrent.Api.Models;
 public class EntryDto {
     public Guid Id { get; set; }
     public string Day { get; set; } = string.Empty;

@@ -4,14 +4,14 @@ using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using AspNetCore.Identity.MongoDbCore.Models;
 using MongoDB.Driver;
 using Microsoft.AspNetCore.Identity;
-using LouisManager.Api.Models;
+using WebTorrent.Api.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using LouisManager.Api.Repositories;
-using LouisManager.Api.Options;
-using LouisManager.Api.Services;
-using LouisManager.Api.Helpers;
+using WebTorrent.Api.Repositories;
+using WebTorrent.Api.Options;
+using WebTorrent.Api.Services;
+using WebTorrent.Api.Helpers;
 
-namespace LouisManager.Api.Extensions;
+namespace WebTorrent.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -26,8 +26,7 @@ public static class ServiceCollectionExtensions
     {
         //transient service
         services.AddTransient<IGoogleOAuthRepository, GoogleOAuthRepository>();
-        services.AddTransient<IEntryRepository, EntryRepository>();
-        services.AddTransient<ITokenRepository, TokenRepository>();
+        services.AddTransient<ITorrentService, TorrentService>();
         return services;
     }
 
@@ -53,7 +52,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IMongoDatabase>(serviceProvider =>
         {
             MongoClient mongoClient = new MongoClient(mongoDbConn);
-            IMongoDatabase mongoDatabase = mongoClient.GetDatabase("louismanager");
+            IMongoDatabase mongoDatabase = mongoClient.GetDatabase("webtorrent");
 
             return mongoDatabase;
         });
@@ -63,7 +62,7 @@ public static class ServiceCollectionExtensions
             MongoDbSettings = new MongoDbSettings
             {
                 ConnectionString = mongoDbConn,
-                DatabaseName = "louismanager"
+                DatabaseName = "webtorrent"
             },
             IdentityOptionsAction = options =>
             {

@@ -1,13 +1,13 @@
-using LouisManager.Api.Extensions;
-using LouisManager.Api.Models;
-using LouisManager.Api.Repositories;
+using WebTorrent.Api.Extensions;
+using WebTorrent.Api.Models;
+using WebTorrent.Api.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
-using CsvHelper;
-using CsvHelper.Configuration;
-using System.Globalization;
-using System.Text;
+using System.Diagnostics;
+using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.ConfigureAutoMapper();
@@ -17,8 +17,16 @@ builder.Services.ConfigureCors();
 builder.Services.ConfigureMongoDb(builder.Configuration);
 builder.Services.SetupCookieAuthentication(builder.Configuration);
 builder.Services.ConfigureServices(builder.Configuration);
-
 builder.Services.AddAuthorization();
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(@"/var/data-protection-keys"))
+    .SetApplicationName("WebTorrent"); // Ensures all instances use the same key
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.Name = "XSRF-TOKEN"; // The cookie name
+    options.HeaderName = "X-XSRF-TOKEN"; // The expected header name
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -32,14 +40,25 @@ else
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAntiforgery();
 
-private readonly string _downloadDir = "/tmp/torrent_downloads";
-private readonly string _torrentDir = "/tmp/torrents";
-
-Directory.CreateDirectory(_downloadDir);
-Directory.CreateDirectory(_torrentDir);
+var downloadDir = "/tmp/torrent_downloads";
+var torrentDir = "/tmp/torrents";
+var downloadProgress = new ConcurrentDictionary<string, int>();
+Directory.CreateDirectory(downloadDir);
+Directory.CreateDirectory(torrentDir);
 
 var apiGroup = app.MapGroup("/api");
+
+app.Use(async (context, next) =>
+{
+    var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
+    var tokens = antiforgery.GetAndStoreTokens(context);
+    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!,
+        new CookieOptions { HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict });
+
+    await next();
+});
 
 apiGroup.MapGet("/google/login", (IGoogleOAuthRepository googleOAuthRepository) =>
 {
@@ -78,47 +97,67 @@ apiGroup.MapPost("/logout", async (HttpContext httpContext) =>
     return Results.Ok("Signed out successfully.");
 });
 
-apiGroup.MapPost("/upload", async (IFormFile file, CancellationToken cancellationToken) =>
+apiGroup.MapPost("/upload", async (HttpContext context, IFormFile file, CancellationToken cancellationToken) =>
 {
+    var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
+    await antiforgery.ValidateRequestAsync(context);
+    
     if (file == null || file.Length == 0)
-            return BadRequest("Invalid file");
+        return Results.BadRequest("Invalid file");
 
-        var filePath = Path.Combine(_torrentDir, file.FileName);
-        using (var stream = new FileStream(filePath, FileMode.Create))
+    var filePath = Path.Combine(torrentDir, file.FileName);
+    using (var stream = new FileStream(filePath, FileMode.Create))
+    {
+        await file.CopyToAsync(stream);
+    }
+
+    // Start downloading using aria2
+    var process = new Process
+    {
+        StartInfo = new ProcessStartInfo
         {
-            await file.CopyToAsync(stream);
+            FileName = "aria2c",
+            Arguments = $"--dir={downloadDir} --input-file={filePath} --seed-time=0",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
         }
-
-        // Start downloading using aria2
-        var process = new Process
+    };
+    process.OutputDataReceived += (sender, args) =>
+    {
+        if (!string.IsNullOrEmpty(args.Data))
         {
-            StartInfo = new ProcessStartInfo
+            if (int.TryParse(args.Data, out int progress))
             {
-                FileName = "aria2c",
-                Arguments = $"--dir={_downloadDir} --input-file={filePath} --seed-time=0",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
+                downloadProgress[file.FileName] = progress;
             }
-        };
-        process.Start();
-        return Results.Ok(new { message = "Download started" });
-}).RequireAuthorization();
+        }
+    };
+    
+    process.Start();
+    process.BeginOutputReadLine();
+    
+    return Results.Ok(new { message = "Download started" });
+});//.RequireAuthorization();
 
-apiGroup.MapGet("/status", async (CancellationToken cancellationToken) =>
+apiGroup.MapGet("/status", async (string filename, CancellationToken cancellationToken) =>
 {
-    return Results.Ok(new { status = "Downloading..." })
-}).RequireAuthorization();
+    if (downloadProgress.TryGetValue(filename, out int progress))
+    {
+        return Results.Ok(new { filename, progress });
+    }
+    return Results.Ok(new { filename, progress = 0 });
+});//.RequireAuthorization();
 
-apiGroup.MapGet("/download", async (CancellationToken cancellationToken) =>
+apiGroup.MapGet("/download", async (string filename, CancellationToken cancellationToken) =>
 {
-    var filePath = Path.Combine(_downloadDir, filename);
-    if (!System.IO.File.Exists(filePath))
-        return NotFound();
+    var filePath = Path.Combine(downloadDir, filename);
+    if (!File.Exists(filePath))
+        return Results.NotFound();
     
     var stream = new FileStream(filePath, FileMode.Open);
-    return File(stream, "application/octet-stream", filename);
-}).RequireAuthorization();
+    return Results.File(stream, "application/octet-stream", filename);
+});//.RequireAuthorization();
 
 app.Run();

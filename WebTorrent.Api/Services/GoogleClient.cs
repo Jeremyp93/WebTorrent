@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using LouisManager.Api.Models;
-using LouisManager.Api.Options;
+using WebTorrent.Api.Models;
+using WebTorrent.Api.Options;
 using Microsoft.Extensions.Options;
 
-namespace LouisManager.Api.Services;
+namespace WebTorrent.Api.Services;
 public interface IGoogleClient
 {
     Task<GoogleUser?> GetUser(string code);

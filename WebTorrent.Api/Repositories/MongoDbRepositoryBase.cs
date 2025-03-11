@@ -1,10 +1,10 @@
-using LouisManager.Api.Helpers;
-using LouisManager.Api.Models;
-using LouisManager.Api.Repositories;
+using WebTorrent.Api.Helpers;
+using WebTorrent.Api.Models;
+using WebTorrent.Api.Repositories;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 
-namespace GroceryList.Infrastructure.Repositories;
+namespace WebTorrent.Api.Repositories;
 
 public interface IRepository<TAggregateRoot, TId> where TAggregateRoot : Entity
 {

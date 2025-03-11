@@ -1,7 +1,7 @@
 using AspNetCore.Identity.MongoDbCore.Models;
 using MongoDbGenericRepository.Attributes;
 
-namespace LouisManager.Api.Models;
+namespace WebTorrent.Api.Models;
 
 [CollectionName("User")]
 public class ApplicationUser : MongoIdentityUser<Guid>

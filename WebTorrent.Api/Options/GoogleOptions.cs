@@ -1,4 +1,4 @@
-namespace LouisManager.Api.Options;
+namespace WebTorrent.Api.Options;
 
 public class GoogleOptions : OAuthOptions
 {

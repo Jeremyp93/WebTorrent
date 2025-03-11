@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace LouisManager.Api.Repositories;
+namespace WebTorrent.Api.Repositories;
 public interface IClaimReader
 {
     Guid GetUserIdFromClaim();

@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ManagerService } from './manager.service';
 
 @Component({
   selector: 'app-manager',
@@ -10,9 +9,7 @@ import { ManagerService } from './manager.service';
   styleUrl: './manager.component.css'
 })
 export class ManagerComponent {
-  #managerService = inject(ManagerService);
-
   ngOnInit(): void {
-    this.#managerService.getEntries().subscribe();
+    
   }
 }

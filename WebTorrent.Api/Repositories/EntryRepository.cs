@@ -1,17 +1,12 @@
-using GroceryList.Infrastructure.Repositories;
-using LouisManager.Api.Helpers;
-using LouisManager.Api.Models;
-using MongoDB.Driver;
+namespace WebTorrent.Api.Repositories;
 
-namespace LouisManager.Api.Repositories;
-
-public interface IEntryRepository : IRepository<Entry, Guid> {
+public interface ITorrentService {
 
 }
 
-public class EntryRepository : MongoDbRepositoryBase<Entry, Guid>, IEntryRepository
+public class TorrentService : ITorrentService
 {
-    public EntryRepository(IMongoDatabase database, IDateTimeProvider dateTimeProvider, IClaimReader claimReader) : base(database, dateTimeProvider, claimReader)
+    public TorrentService()
     {
 
     }

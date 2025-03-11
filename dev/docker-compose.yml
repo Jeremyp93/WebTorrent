@@ -1,44 +1,35 @@
 services:
-  louis-mongodb-dev:
-    container_name: louis-mongodb-dev
+  webtorrent-mongodb-dev:
+    container_name: webtorrent-mongodb-dev
     image: mongo
     restart: unless-stopped
     env_file:
       - mongo.env
     ports:
-      - 27018:27017
+      - 27019:27017
     volumes:
-      - ./database/louismanager:/data/db
+      - ./database/webtorrent:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
-      - louismanager
+      - webtorrent
 
-  louis-mongo-express-dev:
-    container_name: louis-mongo-express-dev
-    image: mongo-express
-    restart: unless-stopped
-    ports:
-      - 8082:8081
-    env_file:
-      - mongo-express.env
-    depends_on:
-      - louis-mongodb-dev
-    networks:
-      - louismanager
-
-  louis-api-dev:
-    container_name: louis-api-dev
+  webtorrent-api-dev:
+    container_name: webtorrent-api-dev
     build:
-      context: ../LouisManager.API
+      context: ../WebTorrent.Api
     env_file:
       - api.env
     ports:
-      - 5059:8800
+      - 5055:8800
+    volumes:
+      - ./tmp/torrent_downloads:/app/downloads
+      - ./tmp/torrents:/app/torrents
+      - ./data-protection-keys:/var/data-protection-keys
     depends_on:
-      - louis-mongodb-dev
+      - webtorrent-mongodb-dev
     networks:
-      - louismanager
+      - webtorrent
 
 networks:
-  louismanager:
+  webtorrent:
     driver: bridge

@@ -1,6 +1,6 @@
-using LouisManager.Api.Exceptions;
+using WebTorrent.Api.Exceptions;
 
-namespace LouisManager.Api.Models;
+namespace WebTorrent.Api.Models;
 public record OAuthProvider
 {
     public string OAuthProviderId { get; private set; } = string.Empty;

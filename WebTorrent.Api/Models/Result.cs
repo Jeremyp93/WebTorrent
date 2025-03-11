@@ -1,4 +1,4 @@
-namespace LouisManager.Api.Models;
+namespace WebTorrent.Api.Models;
 public enum ResultStatusCode
 {
     None,

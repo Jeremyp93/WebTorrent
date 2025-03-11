@@ -1,18 +1,17 @@
 db.createUser({
-  user: "louismanager",
+  user: "webtorrent",
   pwd: "mongo",
   roles: [
     {
       role: "readWrite",
-      db: "louismanager",
+      db: "webtorrent",
     },
-  ],
+  ]
 });
 
-db = new Mongo().getDB("louismanager");
+db = new Mongo().getDB("webtorrent");
 
 db.createCollection("User", { capped: false });
-db.createCollection("Entry", { capped: false });
 
 db.User.insert([
   {

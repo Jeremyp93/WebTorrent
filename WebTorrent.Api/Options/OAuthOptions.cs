@@ -1,4 +1,4 @@
-namespace LouisManager.Api.Options;
+namespace WebTorrent.Api.Options;
 public abstract class OAuthOptions
 {
     public string ClientId { get; set; } = string.Empty;

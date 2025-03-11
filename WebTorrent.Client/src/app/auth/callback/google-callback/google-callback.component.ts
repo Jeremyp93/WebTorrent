@@ -21,7 +21,7 @@ export class GoogleCallbackComponent implements OnInit {
         // Call a service to send the authorization code to your backend
         this.#authService.handleOAuthGoogleCallback(code).subscribe({
           next: () => {
-            this.#router.navigate([`/dashboard`]);
+            this.#router.navigate([`/webtorrent`]);
           },
           error: () => {
             this.#router.navigate(['/error']);

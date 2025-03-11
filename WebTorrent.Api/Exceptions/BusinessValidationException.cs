@@ -1,4 +1,4 @@
-namespace LouisManager.Api.Exceptions;
+namespace WebTorrent.Api.Exceptions;
 
 public class BusinessValidationException : Exception
 {

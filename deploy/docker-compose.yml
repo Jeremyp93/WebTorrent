@@ -1,0 +1,70 @@
+networks:
+  traefik:
+    external: true
+  internal-louismanager:
+    external: false
+
+services:
+  mongodb-louismanager:
+    container_name: "mongodb-louismanager"
+    image: "mongo"
+    restart: unless-stopped
+    env_file:
+      - mongo.env
+    volumes:
+      - ./database/db:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - internal-louismanager
+  mongo-express-louismanager:
+    container_name: mongo-express-louismanager
+    image: mongo-express
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mongo-express-louismanager.entrypoints=websecure"
+      - "traefik.http.routers.mongo-express-louismanager.rule=Host(`mongo-express.louismanager.scotex.tech`)"
+      - "traefik.http.routers.mongo-express-louismanager.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.mongo-express-louismanager.loadbalancer.server.port=8081"
+    networks:
+      - traefik
+      - internal-louismanager
+    env_file:
+      - mongo-express.env
+    depends_on:
+      - mongodb-louismanager
+
+  api-louismanager:
+    container_name: api-louismanager
+    restart: unless-stopped
+    build:
+      context: ../LouisManager.Api
+    networks:
+      - traefik
+      - internal-louismanager
+    env_file:
+      - api.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-louismanager.rule=Host(`api.louismanager.scotex.tech`)"
+      - "traefik.http.routers.api-louismanager.entrypoints=websecure"
+      - "traefik.http.routers.api-louismanager.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.api-louismanager.loadbalancer.server.port=8800"
+    depends_on:
+      - mongodb-louismanager
+  web-louismanager:
+    container_name: web-louismanager
+    restart: unless-stopped
+    build:
+     context: ../LouisManager.Client
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web-louismanager.rule=Host(`louismanager.scotex.tech`)"
+      - "traefik.http.routers.web-louismanager.entrypoints=websecure"
+      - "traefik.http.routers.web-louismanager.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.web-louismanager.loadbalancer.server.port=80"
+    networks:
+      - internal-louismanager
+      - traefik
+    depends_on:
+      - api-louismanager

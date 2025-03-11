@@ -1,0 +1,15 @@
+@if (isVisible()) {
+    <div class="custom-modal">
+        <div class="modal-content">
+          <h2>Token</h2>
+          <p>This is your token:</p>
+          <pre>{{ token() }}</pre>
+          <p class="url">{{ url }}{{token()}}</p>
+          <div class="modal-actions">
+            <button (click)="copyToClipboard()">Copy token</button>
+            <button (click)="copyToClipboardUrl()">Copy url</button>
+            <button (click)="closeModal()">Close</button>
+          </div>
+        </div>
+      </div>
+}

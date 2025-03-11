@@ -347,3 +347,14 @@ healthchecksdb
 
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
+
+# Environment files
+*.env
+
+# Database
+database
+
+**/.vs/
+
+/traefik/acme.json
+/traefik/portainer-data

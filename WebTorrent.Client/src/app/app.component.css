@@ -1,0 +1,22 @@
+.background {
+    width: 100vw;
+    min-height: 100vh;
+    background-color: #C3E8BD; /* Adjust this color for the background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Centered white box */
+  .center-box {
+    width: 90%;
+    height: 80%;
+    flex-wrap: wrap;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+  }

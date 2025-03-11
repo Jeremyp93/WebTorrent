@@ -1,0 +1,44 @@
+services:
+  louis-mongodb-dev:
+    container_name: louis-mongodb-dev
+    image: mongo
+    restart: unless-stopped
+    env_file:
+      - mongo.env
+    ports:
+      - 27018:27017
+    volumes:
+      - ./database/louismanager:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - louismanager
+
+  louis-mongo-express-dev:
+    container_name: louis-mongo-express-dev
+    image: mongo-express
+    restart: unless-stopped
+    ports:
+      - 8082:8081
+    env_file:
+      - mongo-express.env
+    depends_on:
+      - louis-mongodb-dev
+    networks:
+      - louismanager
+
+  louis-api-dev:
+    container_name: louis-api-dev
+    build:
+      context: ../LouisManager.API
+    env_file:
+      - api.env
+    ports:
+      - 5059:8800
+    depends_on:
+      - louis-mongodb-dev
+    networks:
+      - louismanager
+
+networks:
+  louismanager:
+    driver: bridge

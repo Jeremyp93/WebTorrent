@@ -1,0 +1,11 @@
+.main {
+    width: 90%; /* Set width to 90% of the parent background div */
+      max-width: 1200px; /* Optional: limit max width for larger screens */
+      height: 90%;
+      max-height: 800px; /* Optional: limit max height */
+      background-color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+}
